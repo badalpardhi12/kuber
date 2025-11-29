@@ -36,7 +36,7 @@ N_CPU = multiprocessing.cpu_count()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODELS_DIR = os.path.join(BASE_DIR, "models")
 TB_LOG_DIR = os.path.join(BASE_DIR, "tensorboard")
-ENABLE_TENSORBOARD = os.environ.get("KUBER_ENABLE_TENSORBOARD", "0") == "1"
+ENABLE_TENSORBOARD = True
 if ENABLE_TENSORBOARD:
     try:
         import tensorboard  # type: ignore  # noqa: F401
