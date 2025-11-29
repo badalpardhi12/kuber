@@ -168,7 +168,3 @@ The Robinhood broker, streaming engine, risk module, and Streamlit dashboard rem
 
 ## Support
 - Issues & ideas: open a GitHub issue.
-- Email: support@kuber.dev
-- Discord: https://discord.gg/kuber (community chat)
-
-Happy researching!
