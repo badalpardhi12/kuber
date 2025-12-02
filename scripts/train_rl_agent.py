@@ -307,8 +307,40 @@ def train_ticker_agent(ticker: str, queue: multiprocessing.Queue, reference_now:
             ortho_init=False,
         )
         
-        device = "mps" if torch.backends.mps.is_available() else "auto"
-        queue.put(("status", ticker, f"🧠 Training ({device})"))
+        # Smart Device Selection for Cross-Platform Compatibility
+        # 
+        # RecurrentPPO LSTM compatibility:
+        # ✅ CUDA (NVIDIA GPU): Works perfectly
+        # ❌ MPS (Apple Silicon): Crashes with Metal Performance Shaders error
+        # ✅ CPU: Always works but slower
+        # 
+        # Standard PPO (MLP):
+        # ✅ CUDA, MPS, CPU: All work fine
+        
+        has_cuda = torch.cuda.is_available()
+        has_mps = torch.backends.mps.is_available()
+        
+        if USE_LSTM:
+            # RecurrentPPO: Prefer CUDA, fallback to CPU (avoid MPS)
+            if has_cuda:
+                device = "cuda"
+                device_name = "NVIDIA GPU"
+            else:
+                device = "cpu"
+                device_name = "CPU (MPS incompatible with LSTM)"
+            queue.put(("status", ticker, f"🧠 Training LSTM ({device_name})"))
+        else:
+            # Standard PPO: Use best available accelerator
+            if has_cuda:
+                device = "cuda"
+                device_name = "NVIDIA GPU"
+            elif has_mps:
+                device = "mps"
+                device_name = "Apple Silicon GPU"
+            else:
+                device = "cpu"
+                device_name = "CPU"
+            queue.put(("status", ticker, f"🧠 Training MLP ({device_name})"))
         
         # SOTA: Choose between PPO (MLP) and RecurrentPPO (LSTM)
         if USE_LSTM:
